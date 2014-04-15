@@ -14,8 +14,10 @@ A sample code to start using your own webserver as a text/voice/video conference
  </work>
 </document>
 ```
-## Clone this repository
-    $ git clone git@github.com:apidaze/webrtc_server_example
+## Clone this repository and install
+	$ git clone git@github.com:apidaze/webrtc_server_example
+	$ cd webrtc_server_example
+	$ npm install
 
 Files and Folders
 -----------------
