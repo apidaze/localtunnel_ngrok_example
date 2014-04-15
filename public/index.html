@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://api4.apidaze.io/javascript/releases/APIdaze-0.2.0.min.js"></script>
+  </head>
+  <body>
+    <div style="width:90%;margin-left:auto;margin-right:auto">
+      <div style="height: 105px;">
+        <!-- This is the video element that catches your local video. If not set in your HTML code, it will be automatically created -->
+        <video id="_apidaze-av-webrtc-local-1" autoplay="true" style="display: none; width: 177px; height: 100px; border: 1px solid black;"/>
+      </div>
+      <fieldset>
+        <label style="float:left;width:10%">Room name : </label><input type="text" id="roomname" value="room"/><br/>
+        <label style="float:left;width:10%">Nick name : </label><input type="text" id="nickname" value="nick"/><br/>
+        <label style="float:left;width:10%">Actions   : </label><input id="call" type="button" disabled="true" value="Loading ..." /><input id="startvideo" type="button" disabled="true" value="Join in video" /><input id="togglelocalvideo" type="button" disabled="true" value="Stop sending video" />
+      </fieldset>
+    </div>
+    <p></p>
+    <div style="height:470;width:90%;border:1px;margin-left:auto;margin-right:auto">
+      <!-- This div element contains the video streams from other peers in the same room. -->
+      <div id="remotevideos" style="float:left;width:60%;border:1px"><p/></div>
+      <div style="float:left;width:35%;margin-left:5%;border:1px;height:90%"> 
+        <p/>
+        <fieldset>
+          <label style="float:left;width:20%">Chat input : </label><input type="text" id="textchatinput" style="width:80%" disabled="true"/><br/>
+        </fieldset>
+        <!-- This div element displays the various events in the room (who joined, left) as well as text messages sent by peers in the same room. -->
+        <div id="eventswindow" style="overflow-y:scroll;height:inherit"></div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function(){
+        var channel = null;
+        var room = null;
+        var videostarted = false;
+        var client = new APIdaze.CLIENT({
+          type:"webrtc",
+          debug: false,
+          apiKey: "67ca0111",
+          onReady: function(){ 
+            console.log("WebRTC ready"); 
+            $("#call").attr("disabled", false).val("Join in audio");
+          },
+          onError: function(error){ console.log("Component : " + error.component + " - name : " + error.name ); },
+          onDisconnected: function(){ console.log("Disconnected"); }
+        });
+
+        $("#call").click(function() {
+          room = client.joinroom({"roomName": $("#roomname").val(), "nickName": $("#nickname").val(), "someparam": "somevalue"}, {
+            onConfbridgejoin: function(event) {
+              console.log("Confbridge Join Event : " + event.data);
+              var jsondata = JSON.parse(event.data);
+              $("#eventswindow").append("<p style=\"margin:0\"><strong>" + jsondata.name + " joined the conference</strong></p>");
+              document.getElementById("eventswindow").scrollTop = document.getElementById("eventswindow").scrollHeight;
+            },
+            onConfbridgeleave: function(event) {
+              console.log("Confbridge Leave Event : " + event.data);
+              var jsondata = JSON.parse(event.data);
+              $("#eventswindow").append("<p style=\"margin:0\"><strong>" + jsondata.name + " left the conference</strong></p>");
+              document.getElementById("eventswindow").scrollTop = document.getElementById("eventswindow").scrollHeight;
+            },
+            onConfbridgemembers: function(event) {
+              $("#startvideo").attr("disabled", false);
+              $("#textchatinput").attr("disabled", false);
+              console.log("---------Members list : " + event.data);
+              var jsondata = JSON.parse(event.data);
+              console.log(jsondata.members);
+              $("#call").attr("disabled", true);
+            },
+            onConfbridgetalking: function(event) {
+              var jsondata = JSON.parse(event.data);
+              console.log("Channel " + jsondata.channel + " in room " + jsondata.room + " talking status : " + jsondata.talkingstatus);
+            },
+            onConfbridgetextmessage: function(event) {
+              console.log("Received text : " + event.data);
+              var jsondata = JSON.parse(event.data);
+              $("#eventswindow").append("<p style=\"margin:0\"><em>[ " + jsondata.fromnick + " ]</em> :  " + jsondata.text + "</p>");
+              document.getElementById("eventswindow").scrollTop = document.getElementById("eventswindow").scrollHeight;
+            }
+          });
+
+        });
+
+        $("#startvideo").click(function() {
+          room.joinInVideo(
+          {videoContainerId: "remotevideos", mode: "sendrecv"},
+          {
+            onConfbridgenewssrc: function(event) {
+              console.log("New user in video bridge : " + event.data);
+              var jsondata = JSON.parse(event.data);
+            },
+            onConfbridgeleftssrc: function(event) {
+              console.log("User left video bridge : " + event.data);
+              var jsondata = JSON.parse(event.data);
+            },
+            onConfbridgevideomembers: function(event) {
+              console.log("Video members: " + JSON.parse(event.data));
+              $("#togglelocalvideo").attr("disabled", false);
+              videostarted = true;
+            }
+          });
+        });
+
+        $("#togglelocalvideo").click(function() {
+          if (videostarted) {
+            room.stopLocalVideo();
+            videostarted = false;
+            $("#togglelocalvideo").val("Start sending video");;
+          } else {
+            room.startLocalVideo();
+            videostarted = true;
+            $("#togglelocalvideo").val("Stop sending video");;
+          }
+        });
+
+        $("#textchatinput").keypress(function(event){
+          // 13 -> Return key
+          if (event.which == 13) {
+            console.log("Sending text : " + $("#textchatinput").val());
+            room.sendMessage("public", "anyone", $("#textchatinput").val());
+            $("#textchatinput").val("");
+          }
+        });
+      })
+    </script>
+  </body>
+</html>
