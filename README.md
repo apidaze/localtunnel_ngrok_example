@@ -19,10 +19,10 @@ Required modules will go into a new 'node_modules' subfolder
 Running the Server
 ------------------
 
-Type node server in console.
+Type "node server.js" in a terminal.
 
 Viewing the examples
 --------------------
 
 - In your WebRTC enabled browser, visit your server address including the port. By default port 8080 is used.
-- http://localhost:8333 or http://youlocalip:8333, and invite mates to join
+- http://localhost:8333 or http://youlocalip:8333, and invite mates to join.
