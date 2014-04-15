@@ -6,15 +6,16 @@ A sample code to start using your own webserver as a text/voice/video conference
 
 ## Configure
 - create a developer account at APIdaze : http://developers.apidaze.io
-- set up your ExternalScript there to return the following XML
-  <document>
-    <work>
-      <conference>myconference</conference>
-    </work>
-  </document>
-
+- set up your ExternalScript there to return the following XML :
+```xml
+<document>
+ <work>
+  <conference>myconference</conference>
+ </work>
+</document>
+```
 ## Clone this repository
-  $ git clone git@github.com:apidaze/webrtc_server_example
+    $ git clone git@github.com:apidaze/webrtc_server_example
 
 Files and Folders
 -----------------
@@ -25,6 +26,8 @@ Files and Folders
 
 # Run the server
 
+Replace the apiKey in public/index.html with the API key you got from APIdaze.
+
 Type "node server.js" in a terminal. You can also make you web application widely available by deploying it on any Web PaaS service like e.g. Heroku.
 
 # Access your web application
@@ -33,4 +36,4 @@ Type "node server.js" in a terminal. You can also make you web application widel
 - http://localhost:8333 or http://youlocalip:8333, and invite mates to join.
 
 # Place a phone number (PSTN) into the conference
-  $ curl -XPOST "https://api4.apidaze.io/YOUAPPID/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
+	  $ curl -XPOST "https://api4.apidaze.io/YOUAPPID/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
