@@ -25,4 +25,4 @@ Viewing the examples
 --------------------
 
 - In your WebRTC enabled browser, visit your server address including the port. By default port 8080 is used.
-- http://localhost:8080/
+- http://localhost:8333 or http://youlocalip:8333, and invite mates to join
