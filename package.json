@@ -1,0 +1,18 @@
+{
+  "name"        : "webrtc_server_example",
+  "version"     : "0.1",
+  "author"      : "APIdaze. http://apidaze.io",
+  "description" : "A sample WebRTC Voice/Text/Video chat application built with APIdaze's API",
+
+  "scripts": {
+    "start"     : "node server.js"
+  },
+
+  "dependencies" : {
+    "express"   : "*"
+  },
+
+  "engines": {
+    "node"      : ">=0.8"
+  }
+}
