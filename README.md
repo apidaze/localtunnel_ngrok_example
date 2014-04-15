@@ -26,14 +26,14 @@ Files and Folders
 
 # Run the server
 
-Replace the apiKey in public/index.html with the API key you got from APIdaze.
+Replace the apiKey in public/index.html with the application key you got from APIdaze.
 
 Type "node server.js" in a terminal. You can also make you web application widely available by deploying it on any Web PaaS service like e.g. Heroku.
 
 # Access your web application
 
 - In your WebRTC enabled browser, visit your server address including the port. By default port 8333 is used.
-- http://localhost:8333 or http://youlocalip:8333, and invite mates to join.
+- http://localhost:8333 or http://yourlocalip:8333, and invite mates to join.
 
 # Place a phone number (PSTN) into the conference
-	  $ curl -XPOST "https://api4.apidaze.io/YOUAPPID/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
+	  $ curl -XPOST "https://api4.apidaze.io/YOURAPPKEY/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
