@@ -1,6 +1,6 @@
 {
   "name"        : "webrtc_server_example",
-  "version"     : "0.1",
+  "version"     : "0.1.0",
   "author"      : "APIdaze. http://apidaze.io",
   "description" : "A sample WebRTC Voice/Text/Video chat application built with APIdaze's API",
 
