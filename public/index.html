@@ -10,9 +10,10 @@
         <video id="_apidaze-av-webrtc-local-1" autoplay="true" style="width: 177px; height: 100px; border: 1px solid black;"/>
       </div>
       <fieldset>
-        <label style="float:left;width:10%">Room name : </label><input type="text" id="roomname" value="room"/><br/>
-        <label style="float:left;width:10%">Nick name : </label><input type="text" id="nickname" value="nick"/><br/>
-        <label style="float:left;width:10%">Actions   : </label><input id="call" type="button" disabled="true" value="Loading ..." /><input id="startvideo" type="button" disabled="true" value="Join in video" /><input id="togglelocalvideo" type="button" disabled="true" value="Stop sending video" />
+        <label style="float:left;width:10%">APP key : </label><input type="text" id="appkey" value="d3adb33f"/><span style="font-style:italic;font-size:smaller"> for testing purpose only, needs to be replaced by your application key at APIdaze.</span><br/>
+        <label style="float:left;width:10%">Room name : </label><input type="text" id="roomname" value="myconference"/><span style="font-style:italic;font-size:smaller"> pick a name for your conference.</span><br/>
+        <label style="float:left;width:10%">Nick name : </label><input type="text" id="nickname" value="nick"/><span style="font-style:italic;font-size:smaller"> pick a nickname in the conference.</span><br/>
+        <label style="float:left;width:10%">Actions   : </label><input id="connect" type="button" value="Connect" /><input id="call" type="button" disabled="true" value="Join in audio" /><input id="startvideo" type="button" disabled="true" value="Join in video" /><input id="togglelocalvideo" type="button" disabled="true" value="Stop sending video" />
       </fieldset>
     </div>
     <p></p>
@@ -31,19 +32,22 @@
     <script>
       $(document).ready(function(){
         var channel = null;
+        var client = null;
         var room = null;
         var videostarted = false;
-        var client = new APIdaze.CLIENT({
-          type:"webrtc",
-          apiKey: "d3adb33f",
-          onReady: function(){ 
-            console.log("WebRTC ready"); 
-            $("#call").attr("disabled", false).val("Join in audio");
-          },
-          onError: function(error){ console.log("Component : " + error.component + " - name : " + error.name ); },
-          onDisconnected: function(){ console.log("Disconnected"); }
+        $("#connect").click(function() {
+          client = new APIdaze.CLIENT({
+            type:"webrtc",
+            apiKey: $("#appkey").val(),
+            onReady: function(){ 
+              console.log("WebRTC ready"); 
+              $("#call").attr("disabled", false);
+              $("#connect").attr("disabled", true);
+            },
+            onError: function(error){ console.log("Component : " + error.component + " - name : " + error.name ); },
+            onDisconnected: function(){ console.log("Disconnected"); }
+          });
         });
-
         $("#call").click(function() {
           room = client.joinroom({"roomName": $("#roomname").val(), "nickName": $("#nickname").val(), "someparam": "somevalue"}, {
             onConfbridgejoin: function(event) {
