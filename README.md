@@ -25,16 +25,16 @@ Replace the apiKey in public/index.html with the application key you got from AP
 
 Type "node server.js" in a terminal. You can also make you web application widely available by deploying it on any Web PaaS service like e.g. Heroku.
 
-# Customize
+## Customize
 
 Just edit webrtc_server_example/public/index.html
 
-# Access your web application
+## Access your web application
 
 - In your WebRTC enabled browser, visit your server address including the port. By default port 8333 is used.
 - http://localhost:8333 or http://yourlocalip:8333, and invite mates to join by providing them with this URL.
 
-# Place a phone number (PSTN) into the conference
+## Place any phone (PSTN) into the conference
 	  $ curl -XPOST "https://api4.apidaze.io/YOURAPPKEY/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
 
 # Limitations
