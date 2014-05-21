@@ -2,6 +2,8 @@
 
 A sample code to start using your own webserver as an interface to APIdaze text/voice/video conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
 
+This code has been running as an example application here : http://webr.tc/sampleapp.html
+
 # Want to build your own ?
 
 ## Configure
