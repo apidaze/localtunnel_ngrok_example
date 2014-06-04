@@ -2,6 +2,8 @@
 
 A sample code to start using your own webserver as an interface to APIdaze text/voice/video conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
 
+Non WebRTC browsers such as Safari and IE can use the audio/text service using the Adobe's Flash RTMFP.
+
 This code has been running as an example application here : http://webr.tc/sampleapp.html
 
 # Want to build your own ?
@@ -41,4 +43,4 @@ Just edit webrtc_server_example/public/index.html
 
 # Limitations
 
-Audio and text chat works with any WebRTC enabled browser, but our VideoBridge works only with Chrome and Opera. We're working on extending to any WebRTC enabled browser.
+Audio and text chat works with any web browser (we use WebRTC or Adobe's Flash RTMFP	), but our VideoBridge works only with Chrome and Opera. We're working on extending the video feature to any WebRTC enabled browser.
