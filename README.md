@@ -4,8 +4,6 @@ A sample code to start using your own webserver as an interface to APIdaze text/
 
 Non WebRTC browsers such as Safari and IE can use the audio/text service using the Adobe's Flash RTMFP.
 
-This code has been running as an example application here : http://webr.tc/sampleapp.html
-
 # Want to build your own ?
 
 ## Configure
