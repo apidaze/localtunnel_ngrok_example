@@ -108,11 +108,11 @@
 
         $("#togglelocalaudio").click(function() {
           if (audiostarted) {
-            room.stopLocalAudio();
-            audiostarteds = false;
+            client.muteAudioMic();
+            audiostarted = false;
             $("#togglelocalaudio").val("Un-mute audio");;
           } else {
-            room.startLocalAudio();
+            client.unMuteAudioMic();
             audiostarted = true;
             $("#togglelocalaudio").val("Mute audio");;
           }
@@ -122,11 +122,11 @@
           if (videostarted) {
             room.stopLocalVideo();
             videostarted = false;
-            $("#togglelocalvideo").val("Mute video");;
+            $("#togglelocalvideo").val("Un-mute video");;
           } else {
             room.startLocalVideo();
             videostarted = true;
-            $("#togglelocalvideo").val("Un-mute video");;
+            $("#togglelocalvideo").val("Mute video");;
           }
         });
 
