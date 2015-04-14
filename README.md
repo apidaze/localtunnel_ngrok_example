@@ -21,8 +21,6 @@ A sample code to start using your own webserver as an interface to APIdaze text/
 
 # Run the server
 
-Replace the apiKey in public/index.html with the application key you got from APIdaze.
-
 Type "node server.js" in a terminal. You can also make you web application widely available by deploying it on any Web PaaS service like e.g. Heroku.
 
 ## Customize
@@ -31,8 +29,10 @@ Just edit webrtc_server_example/public/index.html
 
 ## Access your web application
 
-- In your WebRTC enabled browser, visit your server address including the port. By default port 8333 is used.
-- http://localhost:8333 or http://yourlocalip:8333, and invite mates to join by providing them with this URL.
+- In your WebRTC enabled browser, visit your server address including the port. By default port 8333 is used ;
+- http://localhost:8333 to test from your browser ;
+- http://yourlocalip:8333, and invite mates in your local network to join by providing them with this URL ;
+- push this code to a publicly available URL to make it accessible to everyone.
 
 ## Place any phone (PSTN) into the conference
 	  $ curl -XPOST "https://api4.apidaze.io/YOURAPPKEY/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
