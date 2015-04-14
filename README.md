@@ -2,8 +2,6 @@
 
 A sample code to start using your own webserver as an interface to APIdaze text/voice/video conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
 
-This code has been running as an example application here : http://webr.tc/sampleapp.html
-
 # Want to build your own ?
 
 ## Configure
@@ -41,4 +39,4 @@ Just edit webrtc_server_example/public/index.html
 
 # Limitations
 
-Audio and text chat works with any WebRTC enabled browser, but our VideoBridge works only with Chrome and Opera. We're working on extending to any WebRTC enabled browser.
+Works on Chrome browser only.
