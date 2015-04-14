@@ -84,7 +84,10 @@
 
         $("#startvideo").click(function() {
           room.joinInVideo(
-          {videoContainerId: "remotevideos", mode: "sendrecv"},
+          {
+            videoContainerId: "remotevideos",
+            mode: "sendrecv"
+          },
           {
             onConfbridgenewssrc: function(event) {
               console.log("New user in video bridge : " + event.data);
@@ -97,6 +100,7 @@
             onConfbridgevideomembers: function(event) {
               console.log("Video members: " + JSON.parse(event.data));
               $("#togglelocalvideo").attr("disabled", false);
+              $("#startvideo").attr("disabled", true);
               videostarted = true;
             }
           });
