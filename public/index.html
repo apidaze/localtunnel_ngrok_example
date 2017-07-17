@@ -1,6 +1,6 @@
 <!--
 
-To run this example locally, you will need to replace 'YOUR_API_KEY' with a valid API key from
+To run this example locally, you will need to replace 'YOURAPPKEY' with a valid API key from
 your developer account at APIdaze, see https://developers.apidaze.io
 
 Then cd to this directory, and expose this page to HTTP, example in PHP :
@@ -75,7 +75,7 @@ php -S localhost:8001
 $(document).ready(function(){
   // Pusher initialization
   var pusher = new Pusher('9c4d0fbc3061dba493b0');
-  var channel = pusher.subscribe('YOUR_API_KEY');
+  var channel = pusher.subscribe('YOURAPPKEY');
   var channel_data = {};
   var current_member_in_room = {}
   var members_in_room = [];
@@ -104,7 +104,7 @@ $(document).ready(function(){
     debug:true,
     audio:true,
     video:false,
-    apiKey: "YOUR_API_KEY",
+    apiKey: "YOURAPPKEY",
     forcewsurl: "wss://ws2.apidaze.io:443",
     onReady: function(){
       console.log("Client ready");
@@ -123,7 +123,7 @@ $(document).ready(function(){
       debug:true,
       audio:true,
       video:false,
-      apiKey: "YOUR_API_KEY",
+      apiKey: "YOURAPPKEY",
       forcewsurl: "wss://ws2.apidaze.io:443",
       onReady: function(){
         $("#call").attr("disabled", false).val("Call");
