@@ -1,136 +1,330 @@
+<!--
+
+To run this example locally, you will need to replace 'YOUR_API_KEY' with a valid API key from
+your developer account at APIdaze, see https://developers.apidaze.io
+
+Then cd to this directory, and expose this page to HTTP, example in PHP :
+php -S localhost:8001
+
+-->
 <html>
   <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://api4.apidaze.io/javascript/releases/APIdaze-master-dev.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="//api4.apidaze.io/javascript/releases/APIdaze-1.2-dev.js"></script>
+    <script src="//js.pusher.com/2.2/pusher.min.js" type="text/javascript"></script>
   </head>
   <body>
-    <a href="https://github.com/apidaze/webrtc_server_example"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
-    <div style="width:90%;margin-left:auto;margin-right:auto">
-      <h2>A simple Video+PSTN web chat application built with APIdaze</h2>
-      <div style="position: fixed; margin-left: auto; margin-right:auto; padding: 10px; bottom:0px;">
-        <p>Want to invite regular phone devices ? Get your API credentials at <a href="https://developers.apidaze.io">https://developers.apidaze.io</a> and call an HTTP REST command. E.g., to invite the phone device with number 0123456789, run this <code>curl</code> command in a terminal :</p>
-        <code>$ curl -XPOST "https://api4.apidaze.io/YOURAPPKEY/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'</code>
-      </div>
-      <div style="height: 105px;">
-        <!-- This is the video element that catches your local video. If not set in your HTML code, it will be automatically created -->
-        <video id="_apidaze-av-webrtc-local-1" autoplay="true" style="width: 177px; height: 100px;"/>
-      </div>
-      <fieldset>
-        <label style="float:left;width:10%">APP key : </label><input type="text" id="appkey" value="84e7de06"/><span style="font-style:italic;font-size:smaller"> for testing purpose only, needs to be replaced by your application key at APIdaze.</span><br/>
-        <label style="float:left;width:10%">Room name : </label><input type="text" id="roomname" value="myconference"/><span style="font-style:italic;font-size:smaller"> pick a name for your conference.</span><br/>
-        <label style="float:left;width:10%">Nick name : </label><input type="text" id="nickname" value="nick"/><span style="font-style:italic;font-size:smaller"> pick a nickname in the conference.</span><br/>
-        <label style="float:left;width:10%">Actions   : </label><input id="connect" type="button" value="Connect" /><input style="margin-left: 15px" id="call" type="button" disabled="true" value="Join in audio" /><input id="togglelocalaudio" type="button" disabled="true" value="Mute audio" /><input style="margin-left: 15px" id="startvideo" type="button" disabled="true" value="Join in video" /><input id="togglelocalvideo" type="button" disabled="true" value="Mute video" />
-      </fieldset>
+    <div>
+      <h2>Place a call</h2>
+      <table border="0">
+        <tr>
+          <td style="width: 150px">
+            <input type="text" id="number_to_call" placeholder="E.g. : 33123456789"/>
+          </td>
+          <td>
+            <input id="call" type="button" disabled="true" style="width: 90px" value="Loading..." />
+          </td>
+          <td>
+            <input id="hangup" type="button" disabled="true" style="width: 90px" value="Hangup" />
+          </td>
+        </tr>
+      </table>
     </div>
-    <p></p>
-    <div style="height:470;width:90%;border:1px;margin-left:auto;margin-right:auto">
-      <!-- This div element contains the video streams from other peers in the same room. -->
-      <div id="remotevideos"></div>
+    <div>
+      <h2>Incoming calls to +33170567760</h2>
+      <table border="0">
+        <tr>
+          <td style="width: 150px">
+            <div id="call_to_answer"></div>
+          </td>
+          <td>
+            <input id="answer" type="button" disabled="true" style="width: 90px" value="Answer" />
+          </td>
+          <td>
+            <input id="hangup-in" type="button" disabled="true" style="width: 90px" value="Hangup" />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <h2>Conference</h2>
+      <table border="0">
+        <tr>
+          <td style="width: 150px">
+            <div id="my_status_inroom"></div>
+          </td>
+          <td>
+            <input id="joinroom" type="button" style="width: 90px" value="Join" class="kick_button" />
+          </td>
+        </tr>
+        <tr id="invite_number_to_conference" >
+          <td style="width: 150px">
+            <input type="text" placeholder="E.g. : 33123456789" disabled=true/>
+          </td>
+          <td>
+            <input type="button" style="width: 90px" value="Invite phone" disabled=true/>
+          </td>
+        </tr>
+      </table>
+      <table id="members_in_room_id">
+        <tbody>
+        </tbody>
+      </table>
     </div>
     <script>
-      $(document).ready(function(){
-        var channel = null;
-        var client = null;
-        var room = null;
-        var videostarted = false;
-        var audiostarted = false;
-        $("#connect").click(function() {
-          client = new APIdaze.CLIENT({
-            type: "webrtc",
-            apiKey: $("#appkey").val(),
-            onReady: function(){ 
-              console.log("Client ready"); 
-              $("#call").attr("disabled", false);
-              $("#connect").attr("disabled", true);
-            },
-            onError: function(error){ console.log("Component : " + error.component + " - name : " + error.name ); },
-            onDisconnected: function(){ console.log("Disconnected"); }
-          });
-        });
-        $("#call").click(function() {
-          room = client.joinroom({"roomName": $("#roomname").val(), "nickName": $("#nickname").val(), "someparam": "somevalue"}, {
-            onConfbridgewelcome: function(event) {
-              console.log("Confbridge Welcome Event : " + event.data);
-              $("#togglelocalaudio").attr("disabled", false);
-              audiostarted = true;
-            },
-            onConfbridgejoin: function(event) {
-              console.log("Confbridge Join Event : " + event.data);
-              var jsondata = JSON.parse(event.data);
-            },
-            onConfbridgeleave: function(event) {
-              console.log("Confbridge Leave Event : " + event.data);
-              var jsondata = JSON.parse(event.data);
-            },
-            onConfbridgemembers: function(event) {
-              $("#startvideo").attr("disabled", false);
-              $("#textchatinput").attr("disabled", false);
-              console.log("---------Members list : " + event.data);
-              var jsondata = JSON.parse(event.data);
-              console.log(jsondata.members);
-              $("#call").attr("disabled", true);
-            },
-            onConfbridgetalking: function(event) {
-              var jsondata = JSON.parse(event.data);
-              console.log("Channel " + jsondata.channel + " in room " + jsondata.room + " talking status : " + jsondata.talkingstatus);
-            },
-            onConfbridgetextmessage: function(event) {
-              console.log("Received text : " + event.data);
-              var jsondata = JSON.parse(event.data);
-            }
-          });
+$(document).ready(function(){
+  // Pusher initialization
+  var pusher = new Pusher('9c4d0fbc3061dba493b0');
+  var channel = pusher.subscribe('YOUR_API_KEY');
+  var channel_data = {};
+  var current_member_in_room = {}
+  var members_in_room = [];
+  var other_members_in_room = [];
+  var room_name = '';
 
-        });
+  channel.bind('incomingcall', function(data) {
+    console.log("PUSHER incomingcall event received with uuid : " + data.uuid + ", caller id number : " + data.caller_id_number + ", exiting : " + data.exiting);
+    channel_data = data; // Fill channel_data with what we received from Pusher
+    $("#call_to_answer").text(data.caller_id_number);
+    $("#answer").attr("disabled", false);
+    if (data.exiting === "true") {
+      // Caller has hung up the call
+      $("#answer").attr("disabled", true);
+      $("#call_to_answer").empty();
+      channel_data = {};
+    }
+  });
 
-        $("#startvideo").click(function() {
-          room.joinInVideo(
-          {
-            videoContainerId: "remotevideos",
-            mode: "sendrecv"
+  // APIdaze client initialization
+  var call = {};
+
+  var audiostarted = false;
+  var client = new APIdaze.CLIENT({
+    type:"webrtc",
+    debug:true,
+    audio:true,
+    video:false,
+    apiKey: "YOUR_API_KEY",
+    forcewsurl: "wss://ws2.apidaze.io:443",
+    onReady: function(){
+      console.log("Client ready");
+      $("#call").attr("disabled", false).val("Call");
+    },
+    onDisconnected: function(){
+      console.log("Client disconnected");
+      $("#call").attr("disabled", false).val("Call");
+    }
+  });
+
+  function resetClient() {
+    client.freeALL();
+    client = new APIdaze.CLIENT({
+      type:"webrtc",
+      debug:true,
+      audio:true,
+      video:false,
+      apiKey: "YOUR_API_KEY",
+      forcewsurl: "wss://ws2.apidaze.io:443",
+      onReady: function(){
+        $("#call").attr("disabled", false).val("Call");
+      },
+      onDisconnected: function(){
+        resetClient();
+        $("#call").attr("disabled", false).val("Call");
+      },
+      onAudiostats: function(event) {
+        $("#rtt").text(event.data.rtt*1000 + " msec");
+        $("#ilostpackets").text(((event.data.ilostpackets * 1 - previlostpackets) * 100 / (event.data.ipackets * 1 - previpackets)) + "%");
+        $("#olostpackets").text((event.data.olostpackets * 1 - prevolostpackets) * 100 / (event.data.ipackets * 1 - prevopackets) + "%");
+
+        prevopackets = event.data.opackets * 1;
+        previpackets = event.data.ipackets * 1;
+        prevolostpackets = event.data.olostpackets * 1;
+        previlostpackets = event.data.ilostpackets * 1;
+      }
+    });
+  };
+
+  // Answer a call
+  $("#answer").click(function(){
+    $("#hangup-in").attr("disabled", false);
+    $("#answer").attr("disabled", true).val("In call");
+    call = client.call(
+        {
+          destination_number: "interception",
+          uuid_to_intercept: channel_data.uuid
+        },
+        {
+          onHangup: function() {
+            console.log("Call hangup");
+            $("#answer").attr("disabled", false).val("Answer");
+            $("#hangup-in").attr("disabled", true);
+            channel_data = {};
+            resetClient();
+          }
+        }
+        );
+  });
+
+  // Place a call
+  $("#call").click(function(){
+    $("#call").attr("disabled", true).val("Calling");
+    call = client.call(
+        { 
+          destination_number: $("#number_to_call").val(),
+          action: "directcall"
+        },
+        {
+          onRinging: function() {
+            console.log("Call ringing");
+            $("#call").val("Ringing");
           },
-          {
-            onConfbridgenewssrc: function(event) {
-              console.log("New user in video bridge : " + event.data);
-              var jsondata = JSON.parse(event.data);
-            },
-            onConfbridgeleftssrc: function(event) {
-              console.log("User left video bridge : " + event.data);
-              var jsondata = JSON.parse(event.data);
-            },
-            onConfbridgevideomembers: function(event) {
-              console.log("Video members: " + JSON.parse(event.data));
-              $("#togglelocalvideo").attr("disabled", false);
-              $("#startvideo").attr("disabled", true);
-              videostarted = true;
-            }
-          });
-        });
-
-        $("#togglelocalaudio").click(function() {
-          if (audiostarted) {
-            client.muteAudioMic();
-            audiostarted = false;
-            $("#togglelocalaudio").val("Un-mute audio");;
-          } else {
-            client.unMuteAudioMic();
+          onAnswer: function() {
+            console.log("Call answered");
+            $("#hangup").attr("disabled", false);
+            $("#call").val("In call");
             audiostarted = true;
-            $("#togglelocalaudio").val("Mute audio");;
+            console.log("Call answered");
+          },
+          onHangup: function() {
+            console.log("Call hangup");
+            $("#hangup").attr("disabled", true);
+            $("#call").attr("disabled", false).val("Call");
+            resetClient();
           }
-        });
+        }
+    );
+  });
 
-        $("#togglelocalvideo").click(function() {
-          if (videostarted) {
-            room.stopLocalVideo();
-            videostarted = false;
-            $("#togglelocalvideo").val("Un-mute video");;
-          } else {
-            room.startLocalVideo();
-            videostarted = true;
-            $("#togglelocalvideo").val("Mute video");;
-          }
-        });
+  $("#hangup").click(function(){
+    call.hangup(); 
+    $("#hangup").attr("disabled", true);
+  });
 
-      })
+  $("#hangup-in").click(function(){
+    call.hangup(); 
+    $("#hangup-in").attr("disabled", true);
+  });
+
+  $("#invite_number_to_conference").on("click", "input[type='button']", function(){
+    console.log("Clicked invite");
+    var number = $("#invite_number_to_conference input[type='text']").val();
+    console.log("Number : " + number);
+    call.inviteToConference(room_name, number, "33170567760");
+  });
+
+  $("tbody").on("click", "input.kick_button", function(){
+    var sessid = $(this).attr("sessid");
+    console.log("Clicked on kick button sessid : " + sessid);
+    call.kickFromConference(room_name, sessid);
+  });
+
+  $("tbody").on("click", "input.mute_button", function(){
+    var conference_member_id = $(this).attr("confMemberID");
+    console.log("Clicked on mute button conference_member_id : " + conference_member_id);
+    var muted = $("#" + $(this).attr("sessid")).attr("muted");
+    console.log("muted : " + muted);
+    if (muted === "true") {
+      call.unmuteInConference(room_name, conference_member_id);
+    } else {
+      call.muteInConference(room_name, conference_member_id);
+    }
+  });
+
+  $("#joinroom").click(function(){
+    call = client.call(
+        {
+          command: "joinroom",
+          username: "guest",
+        },
+        {
+          onRoomInit: function(event) {
+            console.log('RoomInit : ' + JSON.stringify(event.roomname));
+            var room = event.roomname;
+            $("#joinroom").attr("disabled", true);
+            $("#my_status_inroom").text("In '" + room + "'");
+            room_name = room;
+          },
+          onRoommembers: function(event) {
+            console.log('Got members for this room : ' + JSON.stringify(event.members));
+            members_in_room = event.members;
+            other_members_in_room = [];
+
+            $("#members_in_room_id > tbody").empty();
+            if(typeof members_in_room !== "undefined" && members_in_room !== null && call !== null) {
+              members_in_room.forEach(function (member) {
+                console.log("call.callID : " + call.callID);
+                console.log("member.sessid : " + member.sessid);
+                $("#invite_number_to_conference input").attr("disabled", false);
+                //	$("#members_in_room_id > tbody").append('<tr id="invite_number_to_conference"><td style="width: 150px"><input type="text" placeholder="E.g. : 33123456789"/></td><td><input type="button" style="width: 90px" value="Call" /></td></tr>');
+                if (member.sessid === call.callID) {
+                  $("#members_in_room_id > tbody").append('<tr id="' + member.sessid +'" muted=false><td style="width: 150px">' + member.nickname + ' (me)</td><td style="width: 100px" id="' + member.sessid + '-energyscore"></td><td><input class="mute_button" confMemberID="' + member.conferenceMemberID + '" sessid="' + member.sessid + '" type="button" style="width: 90px" value="Toggle Mute" /><input class="kick_button" sessid="' + member.sessid + '" type="button" style="width: 90px" value="Leave" /></td></tr>');
+                  current_member_in_room = member;
+                } else {
+                  $("#members_in_room_id > tbody").append('<tr id="' + member.sessid +'" muted=false><td style="width: 150px">' + member.nickname + '</td><td style="width: 100px" id="' + member.sessid + '-energyscore"></td><td><input class="mute_button" confMemberID="' + member.conferenceMemberID + '" sessid="' + member.sessid + '" type="button" style="width: 90px" value="Toggle Mute" /><input class="kick_button" sessid="' + member.sessid + '" type="button" style="width: 90px" value="Kick" /></td></tr>');
+                  other_members_in_room.push(member);
+                }
+              });
+
+            }
+            console.log('current_member_in_room : ' + JSON.stringify(current_member_in_room));
+            console.log('other_members_in_room : ' + JSON.stringify(other_members_in_room));
+            console.log('members_in_room : ' + JSON.stringify(members_in_room));
+          },
+          onJoinedroom: function(event) {
+            console.log('New member : ' + JSON.stringify(event.member));
+            members_in_room.push(event.member);
+            other_members_in_room.push(event.member);
+            $("#members_in_room_id > tbody").append('<tr id="' + event.member.sessid +'" muted=false><td style="width: 150px">' + event.member.nickname + ' </td><td style="width: 150px" id="' + event.member.sessid + '-energyscore"></td><td><input class="mute_button" confMemberID="' + event.member.conferenceMemberID + '" sessid="' + event.member.sessid + '" type="button" style="width: 90px" value="Toggle Mute" /><input class="kick_button" sessid="' + event.member.sessid + '" type="button" style="width: 90px" value="Kick" /></td></tr>');
+          },
+          onLeftroom: function(event) {
+            console.log('Member left : ' + JSON.stringify(event.member));
+            $("#" + event.member.sessid).remove();
+
+            if(call !== null && event.member.sessid === call.callID) {
+              current_member_in_room = '';
+            }
+
+            for (var index = 0; index < members_in_room.length; index++){
+                                                         if (members_in_room[index].sessid === event.member.sessid) {
+                                                         members_in_room.splice(index,1);
+                                                         console.log('after user left members : ' + JSON.stringify(members_in_room));
+                                                         }
+                                                         }
+
+                                                         for (var index = 0; index < other_members_in_room.length; index++){
+                                                         if (other_members_in_room[index].sessid === event.member.sessid) {
+                                                         other_members_in_room.splice(index,1);
+                                                         console.log('after user left other members : ' + JSON.stringify(other_members_in_room));
+                                                         }
+                                                         }
+
+                                                         },
+                                                         onTalking: function(event) {
+                                                         console.log("Talking event : " + JSON.stringify(event.member));
+                                                         $("#" + event.member.sessid + "-energyscore").text(event.member.energyScore);
+                                                         if (event.member.muted === true) {
+                                                         $("#" + event.member.sessid + " td").css('background-color', 'red');
+                                                         $("#" + event.member.sessid).attr("muted", true);
+                                                         $("#" + event.member.sessid + "-energyscore").text('N/A');
+                                                         } else {
+                                                         $("#" + event.member.sessid + " td").css('background-color', 'white');
+                                                         $("#" + event.member.sessid).attr("muted", false);
+                                                         }
+
+                                                         },
+                                                         onHangup: function(){
+                                                         console.log('Hangup ; Conference ');
+                                                         $("#joinroom").attr("disabled", false);
+                                                         $("#my_status_inroom").empty();
+                                                         $("#members_in_room_id > tbody").empty();
+                                                         $("#invite_number_to_conference input").attr("disabled", true);
+                                                         resetClient();
+                                                         }
+                                                         });
+
+                                                         });
+                                                         })
     </script>
   </body>
 </html>
