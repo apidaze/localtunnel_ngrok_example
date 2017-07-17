@@ -7,7 +7,6 @@ A sample code to start using your own webserver as an interface to APIdaze confe
 ## Clone this repository and install
 	$ git clone git@github.com:apidaze/webrtc_server_example
 	$ cd webrtc_server_example
-	$ npm install
 
 # Configure your external script
 
