@@ -1,27 +1,34 @@
 # APIdaze WebRTC Server Example
 
-A sample code to start using your own webserver as an interface to APIdaze text/voice/video conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
+A sample code to start using your own webserver as an interface to APIdaze conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
 
 # Want to build your own ?
 
-## Configure
-- create a developer account at APIdaze : http://developers.apidaze.io
-- set up your ExternalScript there to return the following XML :
-```xml
-<document>
- <work>
-  <conference>myconference</conference>
- </work>
-</document>
-```
 ## Clone this repository and install
 	$ git clone git@github.com:apidaze/webrtc_server_example
 	$ cd webrtc_server_example
 	$ npm install
 
-# Run the server
+# Configure your external script
 
-Type "node server.js" in a terminal. You can also make you web application widely available by deploying it on any Web PaaS service like e.g. Heroku.
+APIdaze fetches your web server in order to get instructions on how to process calls. Your server must return XML tags to APIdaze, which acts as an HTTP client. You may also want to start your HTTP server locally, and use tools like `localtunnel` or `ngrok` to expose your external script.
+
+## locatunnel
+	$ cd external_script/php
+	$ php -S localhost:8000
+	... then in another terminal
+	$ lt --port 8000 --subdomain apidazeexample
+	your url is: https://apidazeexample.localtunnel.me
+
+Then, in the developers portal, go to `API Reference -> External Script Create` and add `http://apidazeexample.localtunnel.me` to your new external script.
+
+## ngrok
+	$ cd external_script/php
+	$ php -S localhost:8000
+	... then in another terminal
+	$ ./ngrok http 8000
+	
+Then, in the developers portal, go to `API Reference -> External Script Create` and add your ngrok provided URL to your new external script.
 
 ## Customize
 
@@ -29,14 +36,7 @@ Just edit webrtc_server_example/public/index.html
 
 ## Access your web application
 
-- In your WebRTC enabled browser, visit your server address including the port. By default port 8333 is used ;
-- http://localhost:8333 to test from your browser ;
-- http://yourlocalip:8333, and invite mates in your local network to join by providing them with this URL ;
-- push this code to a publicly available URL to make it accessible to everyone.
+	$ cd public
+	$ php -S localhost:8001
 
-## Place any phone (PSTN) into the conference
-	  $ curl -XPOST "https://api4.apidaze.io/YOURAPPKEY/calls" -d 'api_secret=YOURAPPSECRET&type=number&origin=0123456789&destination=myconference'
-
-# Limitations
-
-Works on Chrome browser only.
+Then, in your WebRTC enabled browser, access `http://locahost:8001`.
