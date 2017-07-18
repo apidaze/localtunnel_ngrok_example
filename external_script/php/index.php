@@ -24,7 +24,7 @@ echo "
   <answer/>
   <wait>2</wait>
   <speak>
-  You will now be placed into the confererence
+  You will now be placed into the conference
   </speak>
   <conference>testconference</conference>
  </work>
