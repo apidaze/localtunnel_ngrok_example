@@ -131,16 +131,6 @@ $(document).ready(function(){
       onDisconnected: function(){
         resetClient();
         $("#call").attr("disabled", false).val("Call");
-      },
-      onAudiostats: function(event) {
-        $("#rtt").text(event.data.rtt*1000 + " msec");
-        $("#ilostpackets").text(((event.data.ilostpackets * 1 - previlostpackets) * 100 / (event.data.ipackets * 1 - previpackets)) + "%");
-        $("#olostpackets").text((event.data.olostpackets * 1 - prevolostpackets) * 100 / (event.data.ipackets * 1 - prevopackets) + "%");
-
-        prevopackets = event.data.opackets * 1;
-        previpackets = event.data.ipackets * 1;
-        prevolostpackets = event.data.olostpackets * 1;
-        previlostpackets = event.data.ilostpackets * 1;
       }
     });
   };
