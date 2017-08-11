@@ -1,11 +1,11 @@
-# APIdaze WebRTC Server Example
+# Sample code that works with localtunnel/ngrok
 
-A sample code to start using your own webserver as an interface to APIdaze conference bridge. This web application has been built with APIdaze : http://developers.apidaze.io.
+A sample code to start using your own webserver as an interface to APIdaze conference bridge.
 
 # Want to build your own ?
 
 ## Clone this repository and install
-	$ git clone git@github.com:apidaze/webrtc_server_example
+	$ git clone git@github.com:apidaze/localtunnel_ngrok_example
 	$ cd webrtc_server_example
 
 # Configure your External Script
