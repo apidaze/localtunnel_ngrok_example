@@ -8,7 +8,7 @@ A sample code to start using your own webserver as an interface to APIdaze confe
 	$ git clone git@github.com:apidaze/webrtc_server_example
 	$ cd webrtc_server_example
 
-# Configure your external script
+# Configure your External Script
 
 APIdaze fetches your web server in order to get instructions on how to process calls. Your server must return XML tags to APIdaze, which acts as an HTTP client. You may also want to start your HTTP server locally, and use tools like `localtunnel` or `ngrok` to expose your external script.
 
